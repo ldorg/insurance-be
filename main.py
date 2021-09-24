@@ -4,10 +4,19 @@ from typing import Optional
 
 from fastapi import FastAPI, Header
 from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
 
 from enums import ACCOUNT_TYPES
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 db = shelve.open("db")
 
