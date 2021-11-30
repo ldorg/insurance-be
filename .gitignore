@@ -140,6 +140,7 @@ cython_debug/
 
 # "Database"
 db
+database.db
 
 # Helm
 values.local.yaml

@@ -1,12 +1,13 @@
-import random
-import shelve
-from typing import Optional
-
-from fastapi import FastAPI, Header
-from pydantic import BaseModel
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from enums import ACCOUNT_TYPES
+from models import (
+    RegistrationDetails,
+    LoginDetails,
+    check_if_user_exists,
+    create_user,
+    get_user,
+)
 
 app = FastAPI()
 
@@ -18,42 +19,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-db = shelve.open("db")
-
 
 @app.get("/")
 async def root():
     return {"message": "Welcome to InsuranceHive"}
 
 
-class RegistrationDetails(BaseModel):
-    username: str
-    betaUser: Optional[bool] = False
-    accountType: Optional[str] = None
-
-
 @app.post("/register")
 async def register(registration_details: RegistrationDetails):
-    if registration_details.username in db:
+    user_exists = check_if_user_exists(registration_details)
+    if user_exists:
         return {"message": "Account already exists"}
-    registration_details.accountType = random.choice(ACCOUNT_TYPES)
-    db[registration_details.username] = registration_details
-    return registration_details
-
-
-class LoginDetails(BaseModel):
-    username: str
+    user = create_user(registration_details)
+    return user
 
 
 @app.post("/login")
 async def login(login_details: LoginDetails):
-    if login_details.username not in db:
+    user = get_user(login_details)
+    if not user:
         return {"error": "User does not exist."}
-    return db[login_details.username]
-
-
-@app.get("/me")
-async def me(authorization: Optional[str] = Header(None)):
-    if authorization:
-        return db[authorization]
-    return {"username": None, "betaUser": None, "accountType": None}
+    return user

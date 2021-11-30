@@ -140,5 +140,6 @@ cython_debug/
 
 # "Database"
 db
+database.db
 
 chart/
