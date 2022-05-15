@@ -14,8 +14,8 @@ class User(SQLModel, table=True):
     username: str = Field(sa_column=Column("username", String, unique=True))
     beta_user: Optional[bool]
     account_type: Optional[str]
-    region: Optional[str] = None
-    company: Optional[str] = None
+    region: Optional[str]
+    company: Optional[str]
 
 
 sqlite_file_name = "database.db"
